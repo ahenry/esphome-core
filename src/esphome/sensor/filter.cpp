@@ -141,15 +141,22 @@ optional<float> ThrottleFilter::new_value(float value) {
 }
 
 // DeltaFilter
-DeltaFilter::DeltaFilter(float min_delta) : min_delta_(min_delta), last_value_(NAN) {}
+DeltaFilter::DeltaFilter(float min_delta, bool inverted) 
+    : min_delta_(min_delta), inverted_(inverted), last_value_(NAN) {}
 optional<float> DeltaFilter::new_value(float value) {
   if (isnan(value))
     return {};
   if (isnan(this->last_value_)) {
     return this->last_value_ = value;
   }
-  if (fabsf(value - this->last_value_) >= this->min_delta_) {
-    return this->last_value_ = value;
+  if (inverted_) {
+    if (fabsf(value - this->last_value_) <= this->min_delta_) {
+      return this->last_value_ = value;
+    }
+  } else {
+    if (fabsf(value - this->last_value_) >= this->min_delta_) {
+      return this->last_value_ = value;
+    }
   }
   return {};
 }
@@ -220,6 +227,20 @@ float HeartbeatFilter::get_setup_priority() const { return setup_priority::HARDW
 
 optional<float> CalibrateLinearFilter::new_value(float value) { return value * this->slope_ + this->bias_; }
 CalibrateLinearFilter::CalibrateLinearFilter(float slope, float bias) : slope_(slope), bias_(bias) {}
+
+// RangeFilter
+RangeFilter::RangeFilter(float min, float max) : min_(min), max_(min) {}
+
+optional<float> RangeFilter::new_value(float value) {
+  if (isnan(value))
+    return {};
+  
+  if ((isnan(this->min_) || value >= this->min_) && 
+      (isnan(this->max_) || value <= this->max_))
+    return value;
+
+  return {};
+}
 
 }  // namespace sensor
 

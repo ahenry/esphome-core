@@ -210,12 +210,13 @@ class HeartbeatFilter : public Filter, public Component {
 
 class DeltaFilter : public Filter {
  public:
-  explicit DeltaFilter(float min_delta);
+  explicit DeltaFilter(float min_delta, bool inverted);
 
   optional<float> new_value(float value) override;
 
  protected:
   float min_delta_;
+  bool inverted_;
   float last_value_{NAN};
 };
 
@@ -251,6 +252,16 @@ class CalibrateLinearFilter : public Filter {
  protected:
   float slope_;
   float bias_;
+};
+
+class RangeFilter : public Filter {
+  public:
+   RangeFilter(float min, float max);
+   optional<float> new_value(float value) override;
+
+   protected:
+    float min_;
+    float max_;
 };
 
 }  // namespace sensor
