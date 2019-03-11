@@ -143,6 +143,10 @@ optional<float> ThrottleFilter::new_value(float value) {
 // DeltaFilter
 DeltaFilter::DeltaFilter(float min_delta, bool inverted) 
     : min_delta_(min_delta), inverted_(inverted), last_value_(NAN) {}
+
+DeltaFilter::DeltaFilter(float min_delta)
+    : min_delta_(min_delta), inverted_(false), last_value_(NAN) {}
+
 optional<float> DeltaFilter::new_value(float value) {
   if (isnan(value))
     return {};
@@ -160,6 +164,9 @@ optional<float> DeltaFilter::new_value(float value) {
   }
   return {};
 }
+
+// MaxDeltaFilter
+MaxDeltaFilter::MaxDeltaFilter(float max_delta) : DeltaFilter(max_delta, true) {}
 
 // OrFilter
 OrFilter::OrFilter(std::vector<Filter *> filters) : filters_(std::move(filters)), phi_(this) {}

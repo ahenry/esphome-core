@@ -208,16 +208,42 @@ class HeartbeatFilter : public Filter, public Component {
   bool has_value_{false};
 };
 
+/* This class filters out values which are either not different
+   enough, or too different from the previous value.  In order to
+   not break existing configuration for the DeltaFilter, another
+   class, MaxDeltaFilter, has been introduced, which just initializes
+   this class with the inverted member set to true.
+
+   Another approach might be to allow two types of config in the yaml
+   eg.
+   filters:
+     - delta: 5
+    
+    vs.
+    
+    filters:
+     - delta:
+        value: 5
+        inverted: true
+*/
+
 class DeltaFilter : public Filter {
  public:
-  explicit DeltaFilter(float min_delta, bool inverted);
+  explicit DeltaFilter(float min_delta);
 
   optional<float> new_value(float value) override;
 
  protected:
+  explicit DeltaFilter(float min_delta, bool inverted);
+
   float min_delta_;
   bool inverted_;
   float last_value_{NAN};
+};
+
+class MaxDeltaFilter : public DeltaFilter {
+  public:
+    explicit MaxDeltaFilter(float max_delta);
 };
 
 class OrFilter : public Filter {
