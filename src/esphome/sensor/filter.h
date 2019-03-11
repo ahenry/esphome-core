@@ -225,6 +225,26 @@ class HeartbeatFilter : public Filter, public Component {
      - delta:
         value: 5
         inverted: true
+
+    Or maybe another way would be to re-write the class to have a min and
+    max value, with a simple config that just sets the minimum delta, or a
+    complex one that can set either or both
+
+    filters:
+      - delta:
+          minimum: 0.1
+          maximum: 5
+    
+    or
+
+    filters:
+      -delta:
+        maximum: 5
+
+    or
+
+    filters:
+      -delta: 0.1
 */
 
 class DeltaFilter : public Filter {
