@@ -266,6 +266,18 @@ class MaxDeltaFilter : public DeltaFilter {
     explicit MaxDeltaFilter(float max_delta);
 };
 
+class DeltaFilter2 : public Filter {
+  public:
+    explicit DeltaFilter2(float min_delta, float max_delta);
+
+    optional<float> new_value(float value) override;
+
+  protected:
+    float min_delta_;
+    float max_delta_;
+    float last_value_{NAN};
+};
+
 class OrFilter : public Filter {
  public:
   explicit OrFilter(std::vector<Filter *> filters);
