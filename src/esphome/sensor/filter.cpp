@@ -259,14 +259,13 @@ optional<float> CalibrateLinearFilter::new_value(float value) { return value * t
 CalibrateLinearFilter::CalibrateLinearFilter(float slope, float bias) : slope_(slope), bias_(bias) {}
 
 // RangeFilter
-RangeFilter::RangeFilter(float min, float max) : min_(min), max_(min) {}
+RangeFilter::RangeFilter(float min, float max) : min_(min), max_(max) {}
 
 optional<float> RangeFilter::new_value(float value) {
   if (isnan(value))
     return {};
   
-  if ((isnan(this->min_) || value >= this->min_) && 
-      (isnan(this->max_) || value <= this->max_))
+  if ((isnan(this->min_) || value >= this->min_) && (isnan(this->max_) || value <= this->max_))
     return value;
 
   return {};
