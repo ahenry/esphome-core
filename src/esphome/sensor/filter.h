@@ -210,65 +210,41 @@ class HeartbeatFilter : public Filter, public Component {
 
 /* This class filters out values which are either not different
    enough, or too different from the previous value.  In order to
-   not break existing configuration for the DeltaFilter, another
-   class, MaxDeltaFilter, has been introduced, which just initializes
-   this class with the inverted member set to true.
-
-   Another approach might be to allow two types of config in the yaml
-   eg.
-   filters:
-     - delta: 5
-    
-    vs.
-    
-    filters:
-     - delta:
-        value: 5
-        inverted: true
-
-    Or maybe another way would be to re-write the class to have a min and
-    max value, with a simple config that just sets the minimum delta, or a
-    complex one that can set either or both
+   not break existing configuration for the DeltaFilter, two constructors
+   are provided, one that sets both deltas, and one that sets min_delta
+   and initializes max_delta to +Inf (I don't know if this this necessary,
+   is source-level back-compat an issue, or just config-level?)
 
     filters:
       - delta:
           minimum: 0.1
           maximum: 5
     
-    or
+    The following two are the same
 
     filters:
       -delta:
-        maximum: 5
-
-    or
+        minimum: 5
 
     filters:
-      -delta: 0.1
+      -delta: 5
+
+    As are the next two
+
+    filters:
+      -delta:
+        minimum: 0
+        maximum: 20
+
+    filters:
+      -delta:
+        maximum: 20
 */
 
 class DeltaFilter : public Filter {
- public:
-  explicit DeltaFilter(float min_delta);
-
-  optional<float> new_value(float value) override;
-
- protected:
-  explicit DeltaFilter(float min_delta, bool inverted);
-
-  float min_delta_;
-  bool inverted_;
-  float last_value_{NAN};
-};
-
-class MaxDeltaFilter : public DeltaFilter {
   public:
-    explicit MaxDeltaFilter(float max_delta);
-};
-
-class DeltaFilter2 : public Filter {
-  public:
-    explicit DeltaFilter2(float min_delta, float max_delta);
+    explicit DeltaFilter(float min_delta, float max_delta);
+    explicit DeltaFilter(float min_delta);
 
     optional<float> new_value(float value) override;
 
